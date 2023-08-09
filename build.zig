@@ -17,13 +17,19 @@ pub fn build(b: *std.build.Builder) void {
     // Standard release options allow the person running `zig build` to select
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     // b.setPreferredReleaseMode(std.builtin.Mode.ReleaseSmall);
-    const mode = b.standardReleaseOptions();
-    const elf = b.addExecutable("zig-qemu-vexpress-a9.elf", "src/startup.zig");
-    elf.setTarget(target);
-    elf.setBuildMode(mode);
+    const optimize = b.standardOptimizeOption(.{});
+
+    const elf = b.addExecutable(.{
+            .name = "zig-qemu-vexpress-a9.elf",
+            // In this case the main source file is merely a path, however, in more
+            // complicated build scripts, this could be a generated file.
+            .root_source_file = .{ .path = "src/startup.zig" },
+            .target = target,
+            .optimize = optimize,
+    });
 
     // add other files
-    elf.addAssemblyFileSource(.{ .path = "src/startup.s" });
+    elf.addAssemblyFile(.{ .path = "src/startup.s" });
 
     // add linker script
     elf.setLinkerScriptPath(.{ .path = "src/link.ld" });
@@ -31,11 +37,12 @@ pub fn build(b: *std.build.Builder) void {
     // std.debug.print("mode:{}\n", .{mode});
 
     // BIN STEP
-    const bin = b.addInstallRaw(elf, "zig-qemu-vexpress-a9.bin", .{});
-    const bin_step = b.step("bin", "Generate binary file to be flashed");
-    bin_step.dependOn(&bin.step);
+    const _bin = elf.addObjCopy(.{ .format = .bin });
+    const bin = b.addInstallBinFile(_bin.getOutputSource(), "zig-program.bin");
+    b.getInstallStep().dependOn(&bin.step);
 
     // .
-    b.default_step.dependOn(&elf.step);
     b.installArtifact(elf);
+    b.getInstallStep().dependOn(&bin.step);
 }
+

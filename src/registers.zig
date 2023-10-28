@@ -61,15 +61,64 @@ pub fn RegisterRW(comptime Read: type, comptime Write: type) type {
     };
 }
 
-/// Random number generator
+/// PL011
 pub const UART = struct {
     const base_address = 0x10009000;
     /// DR
-    const DR_val = packed struct {
-        /// RNDATA [0:31]
-        /// Random data
-        RNDATA: u32 = 0,
+    const DR_val = packed struct(u32) {
+        DATA: u8 = 0,
+        FE: u1 = 0,
+        PE: u1 = 0,
+        BE: u1 = 0,
+        OE: u1 = 0,
+        reserved: u20 = 0,
     };
-    /// data register
+
+    /// RSRECR
+    const RSRECR_val = packed struct(u32) {
+        FE: u1 = 0,
+        PE: u1 = 0,
+        BE: u1 = 0,
+        OE: u1 = 0,
+        reserved: u28 = 0,
+    };
+    /// FR
+    const FR_val = packed struct(u32) {
+        CTS: u1 = 0,
+        DSR: u1 = 0,
+        DCD: u1 = 0,
+        BUSY: u1 = 0,
+        RXFE: u1 = 0,
+        TXFF: u1 = 0,
+        RXFF: u1 = 0,
+        TXFE: u1 = 0,
+        RI: u1 = 0,
+
+        reserved: u23 = 0,
+    };
+
+    /// CR
+    const CR_val = packed struct(u32) {
+        UARTEN: u1 = 0,
+        SIREN: u1 = 0,
+        SIRLP: u1 = 0,
+        reserved1: u4 = 0,
+
+        LBE: u1 = 0,
+        TXE: u1 = 0,
+        RXE: u1 = 0,
+        DTR: u1 = 0,
+        RTS: u1 = 0,
+        Out1: u1 = 0,
+        Out2: u1 = 0,
+        RTSEn: u1 = 0,
+        CTSEn: u1 = 0,
+
+        reserved2: u16 = 0,
+    };
+
     pub const DR = Register(DR_val).init(base_address + 0x0);
+    pub const RSRECR = Register(RSRECR_val).init(base_address + 0x04);
+    pub const FR = Register(FR_val).init(base_address + 0x18);
+    pub const CR = Register(CR_val).init(base_address + 0x30);
 };

@@ -1,37 +1,28 @@
-const regs = @import("registers.zig");
-
-// const uart0 = @intToPtr(*volatile u32, 0x10009000);
-
-// used to test variable
-var tmpv: u32 = 'h';
+const uart = @import("uart.zig");
+const putc = uart.putc;
+const getc = uart.getc;
 
 pub fn main() void {
-    putc(tmpv);
-    putc('e');
-    putc('l');
-    putc('l');
-    tmpv = 'o';
-    putc(tmpv);
-
-    putc('w');
-    putc('o');
-    putc('r');
-    putc('l');
-    putc('d');
+    puts("hello world\r\n");
 
     while (true) {
-        putc('.');
+        uart.putc('.');
         delay();
+        if (uart.getc()) |d| {
+            uart.putc(d);
+        }
     }
-}
-
-fn putc(c: u32) void {
-    regs.UART.DR.write(.{ .RNDATA = c });
 }
 
 fn delay() void {
     var i: u32 = 0;
-    while (i < 80000000) {
+    while (i < 100000000) {
         i += 1;
+    }
+}
+
+fn puts(s: []const u8) void {
+    for (s) |c| {
+        uart.putc(c);
     }
 }

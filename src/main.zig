@@ -5,19 +5,11 @@ const getc = uart.getc;
 pub fn main() void {
     puts("hello world\r\n");
 
+    puts("echo mode:\n");
     while (true) {
-        uart.putc('.');
-        delay();
         if (uart.getc()) |d| {
             uart.putc(d);
         }
-    }
-}
-
-fn delay() void {
-    var i: u32 = 0;
-    while (i < 100000000) {
-        i += 1;
     }
 }
 

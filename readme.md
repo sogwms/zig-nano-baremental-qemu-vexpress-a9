@@ -1,27 +1,21 @@
 ## Environement
 
-- zig@0.10.1
+- zig@0.10.1 | zig@0.11.0
 - qemu@8.0.0
-- git-bash (needed on windows)
+- make
 
 ## Usage
 
-- use elf
-```shell
-zig build 
+```
+# step1 build
+make
+# step2 run
+make run
 
-bash runqemu.sh
 ```
 
-Or
-
-- use bin
-```shell
-zig build bin
-
-bash runqemuWithBin.sh
-```
+**check Makefile to see more details**
 
 ## Debug
 
-see rungdbqemu.sh and doc/gdb.md
+see doc/gdb.md
